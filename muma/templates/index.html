@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>实时图片显示</title>
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background: #f0f0f0; 
+        }
+        #image-container { 
+            max-width: 100%; 
+            max-height: 100%; 
+        }
+        #live-image { 
+            max-width: 100%; 
+            max-height: 80vh; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div id="image-container">
+        <img id="live-image" src="" alt="实时画面">
+    </div>
+
+    <script>
+        const socket = io();
+        const imageElement = document.getElementById('live-image');
+        
+        function updateImage(timestamp) {
+            // 添加时间戳防止缓存
+            imageElement.src = `/image?timestamp=${timestamp}`;
+        }
+        
+        // 接收图片更新通知
+        socket.on('image_updated', (data) => {
+            updateImage(data.timestamp);
+        });
+        
+        // 页面加载时初始化
+        window.onload = () => {
+            socket.on('connect', () => {
+                console.log('已连接到服务器');
+            });
+        };
+    </script>
+</body>
+</html>
